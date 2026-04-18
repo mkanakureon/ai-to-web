@@ -1,11 +1,13 @@
 // render() の ANSI 出力をパースして仮想スクリーンを再構成する。
 // 実機 TTY なしで 4ペインレイアウト・T字・テキスト配置を検証するための開発用ユーティリティ。
-// 使い方: npx tsx scripts/snapshot.ts [width] [height]
+// 使い方: npx tsx scripts/snapshot.ts [lessonId] [width] [height]
+//   npx tsx scripts/snapshot.ts L0-2 120 40
+//   npx tsx scripts/snapshot.ts all            (全レッスン・全ステップ)
 
 import { render } from "../src/render.js";
 import { charWidth } from "../src/ansi.js";
-import { l0_1 } from "../src/content/l0-1.js";
-import type { AppState } from "../src/types.js";
+import { LESSONS, getLesson } from "../src/content/index.js";
+import type { AppState, Lesson } from "../src/types.js";
 
 type Grid = string[][];
 
@@ -33,8 +35,6 @@ function reconstruct(ansi: string, w: number, h: number): Grid {
         const parts = params.split(";").map((s) => parseInt(s, 10));
         row = Number.isFinite(parts[0]) && (parts[0] ?? 0) > 0 ? parts[0]! : 1;
         col = Number.isFinite(parts[1]) && (parts[1] ?? 0) > 0 ? parts[1]! : 1;
-      } else if (letter === "J") {
-        // 2J で全消去。続く H が home に戻すのでここでは座標リセット不要。
       }
       i = j + 1;
       continue;
@@ -62,9 +62,9 @@ function gridToString(grid: Grid): string {
     .join("\n");
 }
 
-function makeState(stepIndex: number, quizInput: string | null = null): AppState {
+function makeState(lesson: Lesson, stepIndex: number, quizInput: string | null = null): AppState {
   return {
-    lesson: l0_1,
+    lesson,
     stepIndex,
     displayMode: "binary",
     autoPlay: false,
@@ -73,32 +73,42 @@ function makeState(stepIndex: number, quizInput: string | null = null): AppState
   };
 }
 
-const args = process.argv.slice(2);
-const W = Number.parseInt(args[0] ?? "120", 10);
-const H = Number.parseInt(args[1] ?? "40", 10);
-
-const separator = "=".repeat(W);
-
-for (let i = 0; i < l0_1.steps.length; i++) {
-  const label = `STEP ${i + 1}/${l0_1.steps.length}`;
-  console.log(`\n${separator}`);
-  console.log(`  ${label}`);
-  console.log(separator);
-  const out = render(makeState(i), W, H);
-  console.log(gridToString(reconstruct(out, W, H)));
+function renderSnapshot(lesson: Lesson, stepIndex: number, w: number, h: number, quizInput: string | null = null): string {
+  const state = makeState(lesson, stepIndex, quizInput);
+  return gridToString(reconstruct(render(state, w, h), w, h));
 }
 
-console.log(`\n${separator}`);
-console.log(`  STEP 5 / correct answer (b)`);
-console.log(separator);
-console.log(gridToString(reconstruct(render(makeState(4, "b"), W, H), W, H)));
+const args = process.argv.slice(2);
+const target = args[0] ?? "L0-1";
+const W = Number.parseInt(args[1] ?? "120", 10);
+const H = Number.parseInt(args[2] ?? "40", 10);
+const separator = "=".repeat(W);
 
-console.log(`\n${separator}`);
-console.log(`  STEP 5 / wrong answer (a)`);
-console.log(separator);
-console.log(gridToString(reconstruct(render(makeState(4, "a"), W, H), W, H)));
+function dumpLesson(lesson: Lesson, w: number, h: number): void {
+  for (let i = 0; i < lesson.steps.length; i++) {
+    console.log(`\n${separator}`);
+    console.log(`  ${lesson.id} STEP ${i + 1}/${lesson.steps.length}`);
+    console.log(separator);
+    console.log(renderSnapshot(lesson, i, w, h));
+  }
+  const lastIndex = lesson.steps.length - 1;
+  const lastStep = lesson.steps[lastIndex];
+  if (lastStep?.explainQuiz.quiz) {
+    console.log(`\n${separator}`);
+    console.log(`  ${lesson.id} final step / correct answer (${lastStep.explainQuiz.quiz.correctId})`);
+    console.log(separator);
+    console.log(renderSnapshot(lesson, lastIndex, w, h, lastStep.explainQuiz.quiz.correctId));
+  }
+}
 
-console.log(`\n${separator}`);
-console.log(`  MINIMUM SIZE 80x24`);
-console.log(separator);
-console.log(gridToString(reconstruct(render(makeState(4, "b"), 80, 24), 80, 24)));
+if (target === "all") {
+  for (const lesson of LESSONS) dumpLesson(lesson, W, H);
+} else {
+  const lesson = getLesson(target);
+  if (!lesson) {
+    console.error(`Unknown lesson: ${target}`);
+    console.error(`Available: ${LESSONS.map((l) => l.id).join(", ") + ", all"}`);
+    process.exit(1);
+  }
+  dumpLesson(lesson, W, H);
+}
