@@ -1,0 +1,23 @@
+{
+  "name": "ai-to-web",
+  "version": "0.0.1",
+  "description": "AI時代の学習ツール — ブラウザ+サーバー+TS+DB を自力で作れるようになるための TUI 学習アプリ",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/index.js",
+    "test": "tsx scripts/reducer-check.ts",
+    "snapshot": "tsx scripts/snapshot.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}
