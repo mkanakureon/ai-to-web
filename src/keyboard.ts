@@ -1,41 +1,8 @@
-// raw モードの stdin を KeyEvent ストリームに変換
+// キー入力 (raw mode stdin / xterm.js) → KeyEvent パーサ。
+// プラットフォーム固有の「入力源」は src/io/ で抽象化し、ここは純粋な parseKey のみ。
 import type { KeyEvent } from "./types.js";
 
-type Listener = (ev: KeyEvent) => void;
-
-export type Keyboard = {
-  dispose: () => void;
-};
-
-export function startKeyboard(onKey: Listener): Keyboard {
-  const stdin = process.stdin;
-  if (!stdin.isTTY) {
-    throw new Error("stdin is not a TTY; interactive mode requires a terminal.");
-  }
-  stdin.setRawMode(true);
-  stdin.resume();
-  stdin.setEncoding("utf8");
-
-  const handler = (data: string): void => {
-    const ev = parseKey(data);
-    if (ev) onKey(ev);
-  };
-  stdin.on("data", handler);
-
-  return {
-    dispose: (): void => {
-      stdin.off("data", handler);
-      try {
-        stdin.setRawMode(false);
-      } catch {
-        // ignore
-      }
-      stdin.pause();
-    },
-  };
-}
-
-function parseKey(data: string): KeyEvent | null {
+export function parseKey(data: string): KeyEvent | null {
   // Ctrl+C / Ctrl+D: 画面を問わず強制終了
   if (data === "\x03" || data === "\x04") return { kind: "forceQuit" };
   // 矢印キー (ESC [ A/B/C/D)

@@ -9,7 +9,10 @@
   },
   "scripts": {
     "dev": "tsx src/index.ts",
+    "dev:web": "vite",
     "build": "tsc",
+    "build:web": "vite build",
+    "preview:web": "vite preview",
     "typecheck": "tsc --noEmit",
     "start": "node dist/index.js",
     "test": "tsx scripts/reducer-check.ts",
@@ -17,7 +20,10 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "^6.0.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "vite": "^8.0.8"
   }
 }

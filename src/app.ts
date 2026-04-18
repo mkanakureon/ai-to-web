@@ -1,12 +1,14 @@
 // メインループ: input → reduce → render
+// I/O は引数で受け取る (Node TTY / xterm.js どちらでも動く)
 import { getLesson, listLessonIds, LESSONS } from "./content/index.js";
 import type { AppState, Lesson } from "./types.js";
 import { reduce, enterTitle, enterLesson } from "./reduce.js";
 import { render } from "./render.js";
-import { startKeyboard, type Keyboard } from "./keyboard.js";
+import { parseKey } from "./keyboard.js";
 import { clearScreen, hideCursor, showCursor, moveTo, RESET } from "./ansi.js";
+import type { IO } from "./io/types.js";
 
-function selectInitialState(argv: string[]): AppState {
+export function selectInitialState(argv: string[]): AppState {
   const requested = argv[2];
   if (!requested) return enterTitle();
   if (requested === "--help" || requested === "-h") {
@@ -36,51 +38,27 @@ function printUsage(): void {
   --help     このヘルプを表示`);
 }
 
-function getTermSize(): { w: number; h: number } {
-  return {
-    w: process.stdout.columns ?? 120,
-    h: process.stdout.rows ?? 40,
-  };
-}
-
-function restoreTerminal(): void {
-  const h = process.stdout.rows ?? 24;
-  process.stdout.write(showCursor() + moveTo(h, 1) + RESET + "\n");
-}
-
-// 異常終了時のカーソル復帰
-process.on("exit", () => {
-  process.stdout.write(showCursor() + RESET);
-});
-
-export async function runApp(): Promise<void> {
-  const initial = selectInitialState(process.argv);
-
-  if (!process.stdout.isTTY) {
-    runHeadless(initial);
-    return;
-  }
-
+export async function runApp(io: IO, initial: AppState): Promise<void> {
   let state: AppState = initial;
   const draw = (): void => {
-    const { w, h } = getTermSize();
-    process.stdout.write(render(state, w, h));
+    const { cols, rows } = io.getSize();
+    io.write(render(state, cols, rows));
   };
 
-  const onResize = (): void => draw();
-  let kb: Keyboard | null = null;
-
-  process.stdout.write(hideCursor() + clearScreen());
+  io.write(hideCursor() + clearScreen());
   draw();
-  process.stdout.on("resize", onResize);
+
+  const unsubResize = io.onResize(draw);
 
   await new Promise<void>((resolve) => {
-    kb = startKeyboard((ev) => {
+    const unsubKey = io.onKey((data) => {
+      const ev = parseKey(data);
+      if (!ev) return;
       state = reduce(state, ev);
       if (state.quit) {
-        process.stdout.off("resize", onResize);
-        kb?.dispose();
-        restoreTerminal();
+        unsubKey();
+        unsubResize();
+        io.write(showCursor() + RESET);
         resolve();
         return;
       }
@@ -89,7 +67,7 @@ export async function runApp(): Promise<void> {
   });
 }
 
-function runHeadless(state: AppState): void {
+export function runHeadless(state: AppState): void {
   if (state.screen === "title") {
     console.log(`[ai-to-web] TTY未検出。タイトル画面 (ヘッドレス)`);
     console.log(`lessons: ${LESSONS.map((l) => l.id).join(", ")}`);
@@ -103,7 +81,6 @@ function runHeadless(state: AppState): void {
     }
     return;
   }
-  // lesson
   const lesson: Lesson = state.lesson;
   console.log(`[ai-to-web] TTY未検出のためヘッドレス表示 (lesson=${lesson.id})`);
   console.log(`lesson: ${lesson.id} "${lesson.title}"`);
