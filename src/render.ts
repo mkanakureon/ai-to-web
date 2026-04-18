@@ -443,58 +443,58 @@ function renderIntro(state: LessonIntroState, termW: number, termH: number): str
   const leftCol = Math.max(1, Math.floor((W - contentW) / 2) + 1);
   const innerCol = leftCol + 2;
   const innerW = contentW - 2;
+  const maxRow = H - 2; // 下 2 行はキーヒント + 余白として確保
 
   let out = clearScreen();
   let row = 2;
 
-  // Header: "L0-1  2進数とビット" + underline
+  const put = (col: number, text: string): void => {
+    if (row > maxRow) return;
+    out += moveTo(row, col) + text;
+    row++;
+  };
+  const spaceLeft = (): number => Math.max(0, maxRow - row);
+
+  // Header: "L0-0  このツールについて" + underline
   const header = `${state.lesson.id}  ${state.lesson.title}`;
-  out += moveTo(row, leftCol) + paint(FG.cyan + BOLD, header);
+  put(leftCol, paint(FG.cyan + BOLD, header));
+  put(leftCol, paint(FG.cyan, "─".repeat(Math.min(stringWidth(header) + 6, contentW))));
   row++;
-  out += moveTo(row, leftCol) + paint(FG.cyan, "─".repeat(Math.min(stringWidth(header) + 6, contentW)));
-  row += 2;
 
   // 到達目標
-  out += moveTo(row, leftCol) + paint(BOLD, "到達目標");
-  row++;
+  if (spaceLeft() > 0) put(leftCol, paint(BOLD, "到達目標"));
   for (const line of wrapLines(state.lesson.intro.objective, innerW)) {
-    out += moveTo(row, innerCol) + line;
-    row++;
+    put(innerCol, line);
   }
   row++;
 
   // このレッスンについて
-  out += moveTo(row, leftCol) + paint(BOLD, "このレッスンについて");
-  row++;
+  if (spaceLeft() > 0) put(leftCol, paint(BOLD, "このレッスンについて"));
   for (const paragraph of state.lesson.intro.overview) {
+    if (spaceLeft() <= 0) break;
     for (const line of wrapLines(paragraph, innerW)) {
-      out += moveTo(row, innerCol) + line;
-      row++;
+      put(innerCol, line);
     }
     row++;
   }
 
   // キーワード
-  if (state.lesson.intro.terms.length > 0) {
-    out += moveTo(row, leftCol) + paint(BOLD, "キーワード");
-    row++;
+  if (state.lesson.intro.terms.length > 0 && spaceLeft() > 1) {
+    put(leftCol, paint(BOLD, "キーワード"));
     for (const t of state.lesson.intro.terms) {
-      const head = `・${t.term}`;
-      out += moveTo(row, innerCol) + paint(FG.cyan, head);
-      row++;
+      if (spaceLeft() <= 0) break;
+      put(innerCol, paint(FG.cyan, `・${t.term}`));
       for (const line of wrapLines(t.description, innerW - 4)) {
-        out += moveTo(row, innerCol + 4) + paint(DIM, line);
-        row++;
+        put(innerCol + 4, paint(DIM, line));
       }
     }
     row++;
   }
 
   // 予告
-  if (state.lesson.intro.firstStepHint) {
+  if (state.lesson.intro.firstStepHint && spaceLeft() > 0) {
     for (const line of wrapLines(state.lesson.intro.firstStepHint, innerW)) {
-      out += moveTo(row, leftCol) + paint(DIM, line);
-      row++;
+      put(leftCol, paint(DIM, line));
     }
   }
 
