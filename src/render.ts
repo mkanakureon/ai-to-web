@@ -268,7 +268,15 @@ function renderCpuBusMemory(rect: Rect, s: CpuBusMemoryState): string {
   for (const cell of s.memoryCells) {
     const labelPart = cell.label ? `  ${cell.label}` : "";
     const base = `  ${cell.address}: ${cell.value}${labelPart}`;
-    lines.push(cell.selected ? `${INVERSE}${base}${RESET}` : base);
+    let rendered: string;
+    if (cell.selected) {
+      rendered = `${INVERSE}${base}${RESET}`;
+    } else if (cell.dim) {
+      rendered = paint(DIM, base);
+    } else {
+      rendered = base;
+    }
+    lines.push(rendered);
   }
 
   for (let i = 0; i < rect.height; i++) {

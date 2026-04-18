@@ -21,6 +21,7 @@ export type MemoryCell = {
   value: string;
   label?: string;
   selected?: boolean;
+  dim?: boolean;  // padding などで薄く表示したい場合
 };
 
 export type CpuBusMemoryPhase =
