@@ -7,7 +7,8 @@
 import { render } from "../src/render.js";
 import { charWidth } from "../src/ansi.js";
 import { LESSONS, getLesson } from "../src/content/index.js";
-import type { AppState, Lesson } from "../src/types.js";
+import { enterTitle, enterMenu, enterLesson } from "../src/reduce.js";
+import type { AppState, Lesson, LessonPlayState } from "../src/types.js";
 
 type Grid = string[][];
 
@@ -62,19 +63,11 @@ function gridToString(grid: Grid): string {
     .join("\n");
 }
 
-function makeState(lesson: Lesson, stepIndex: number, quizInput: string | null = null): AppState {
-  return {
-    lesson,
-    stepIndex,
-    displayMode: "binary",
-    autoPlay: false,
-    quizInput,
-    quit: false,
-  };
+function makeLessonState(lesson: Lesson, stepIndex: number, quizInput: string | null = null): LessonPlayState {
+  return { ...enterLesson(lesson), stepIndex, quizInput };
 }
 
-function renderSnapshot(lesson: Lesson, stepIndex: number, w: number, h: number, quizInput: string | null = null): string {
-  const state = makeState(lesson, stepIndex, quizInput);
+function renderSnapshot(state: AppState, w: number, h: number): string {
   return gridToString(reconstruct(render(state, w, h), w, h));
 }
 
@@ -89,7 +82,7 @@ function dumpLesson(lesson: Lesson, w: number, h: number): void {
     console.log(`\n${separator}`);
     console.log(`  ${lesson.id} STEP ${i + 1}/${lesson.steps.length}`);
     console.log(separator);
-    console.log(renderSnapshot(lesson, i, w, h));
+    console.log(renderSnapshot(makeLessonState(lesson, i), w, h));
   }
   const lastIndex = lesson.steps.length - 1;
   const lastStep = lesson.steps[lastIndex];
@@ -97,12 +90,35 @@ function dumpLesson(lesson: Lesson, w: number, h: number): void {
     console.log(`\n${separator}`);
     console.log(`  ${lesson.id} final step / correct answer (${lastStep.explainQuiz.quiz.correctId})`);
     console.log(separator);
-    console.log(renderSnapshot(lesson, lastIndex, w, h, lastStep.explainQuiz.quiz.correctId));
+    console.log(renderSnapshot(makeLessonState(lesson, lastIndex, lastStep.explainQuiz.quiz.correctId), w, h));
+  }
+}
+
+function dumpTitle(w: number, h: number): void {
+  console.log(`\n${separator}`);
+  console.log(`  TITLE SCREEN`);
+  console.log(separator);
+  console.log(renderSnapshot(enterTitle(), w, h));
+}
+
+function dumpMenu(w: number, h: number): void {
+  for (let i = 0; i < LESSONS.length; i++) {
+    console.log(`\n${separator}`);
+    console.log(`  MENU (selected=${LESSONS[i]?.id})`);
+    console.log(separator);
+    console.log(renderSnapshot(enterMenu(i), w, h));
+    if (i >= 1) break; // 代表 2 個だけ出す
   }
 }
 
 if (target === "all") {
+  dumpTitle(W, H);
+  dumpMenu(W, H);
   for (const lesson of LESSONS) dumpLesson(lesson, W, H);
+} else if (target === "title") {
+  dumpTitle(W, H);
+} else if (target === "menu") {
+  dumpMenu(W, H);
 } else {
   const lesson = getLesson(target);
   if (!lesson) {

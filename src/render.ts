@@ -3,11 +3,14 @@
 
 import type {
   AppState,
+  LessonPlayState,
+  MenuState,
   TargetPaneState,
   RepresentationPaneState,
   CpuBusMemoryState,
   ExplainQuizPaneState,
 } from "./types.js";
+import { LESSONS } from "./content/index.js";
 import {
   clearScreen,
   moveTo,
@@ -275,7 +278,22 @@ function renderCpuBusMemory(rect: Rect, s: CpuBusMemoryState): string {
   return out;
 }
 
-function renderExplainQuiz(rect: Rect, s: ExplainQuizPaneState, quizInput: string | null): string {
+function computeKeyHints(isLastStep: boolean, hasQuiz: boolean): string[] {
+  const hints = [
+    isLastStep ? "[n]finish" : "[n]next",
+    "[p]prev",
+    "[m/q]menu",
+  ];
+  if (hasQuiz) hints.push("[a/b/c]answer");
+  return hints;
+}
+
+function renderExplainQuiz(
+  rect: Rect,
+  s: ExplainQuizPaneState,
+  quizInput: string | null,
+  isLastStep: boolean,
+): string {
   let out = renderPaneBackground(rect);
   const lines: string[] = [];
 
@@ -304,7 +322,8 @@ function renderExplainQuiz(rect: Rect, s: ExplainQuizPaneState, quizInput: strin
     if (quizInput) {
       lines.push("");
       if (quizInput === quiz.correctId) {
-        lines.push(paint(FG.green, "正解! [n] で次へ"));
+        const msg = isLastStep ? "正解! [n] で完了 → メニューへ" : "正解! [n] で次へ";
+        lines.push(paint(FG.green, msg));
       } else {
         const correct = quiz.choices.find((c) => c.id === quiz.correctId);
         const correctText = correct ? `${correct.id}) ${correct.text}` : quiz.correctId;
@@ -313,8 +332,9 @@ function renderExplainQuiz(rect: Rect, s: ExplainQuizPaneState, quizInput: strin
     }
   }
 
+  const keyHints = computeKeyHints(isLastStep, !!s.quiz);
   lines.push("");
-  lines.push(paint(DIM, s.keyHints.join("  ")));
+  lines.push(paint(DIM, keyHints.join("  ")));
 
   for (let i = 0; i < rect.height; i++) {
     const line = lines[i] ?? "";
@@ -323,23 +343,120 @@ function renderExplainQuiz(rect: Rect, s: ExplainQuizPaneState, quizInput: strin
   return out;
 }
 
-export function render(state: AppState, termW: number, termH: number): string {
+function centerCol(termW: number, text: string): number {
+  return Math.max(1, Math.floor((termW - stringWidth(text)) / 2) + 1);
+}
+
+function renderTitle(termW: number, termH: number): string {
+  const W = Math.max(80, termW);
+  const H = Math.max(24, termH);
+
+  const titleBox = [
+    "╔════════════════════════════════════╗",
+    "║                                    ║",
+    "║          a i - t o - w e b         ║",
+    "║                                    ║",
+    "╚════════════════════════════════════╝",
+  ];
+  const subtitle = [
+    "「CPU → バス → メモリ」を見ながら",
+    "AI と会話できる知識を身につける TUI 学習ツール",
+  ];
+  const hints = [
+    "[Enter]  start",
+    "[q]      quit",
+  ];
+
+  let out = clearScreen();
+
+  const total = titleBox.length + 2 + subtitle.length + 3 + hints.length;
+  let row = Math.max(2, Math.floor((H - total) / 2));
+
+  for (const line of titleBox) {
+    out += moveTo(row, centerCol(W, line)) + paint(FG.cyan + BOLD, line);
+    row++;
+  }
+  row += 2;
+  for (const line of subtitle) {
+    out += moveTo(row, centerCol(W, line)) + line;
+    row++;
+  }
+  row += 3;
+  for (const line of hints) {
+    out += moveTo(row, centerCol(W, line)) + paint(DIM, line);
+    row++;
+  }
+  return out;
+}
+
+function renderMenu(state: MenuState, termW: number, termH: number): string {
+  const W = Math.max(80, termW);
+  const H = Math.max(24, termH);
+
+  const header = "Select a Lesson";
+  const items = LESSONS.map((l, i) => {
+    const marker = i === state.index ? ">" : " ";
+    return `${marker}  ${l.id.padEnd(5)}  ${l.title}`;
+  });
+  const hints = ["[up/down or j/k]  select    [Enter]  start    [q]  quit"];
+
+  let out = clearScreen();
+
+  const total = 1 + 2 + items.length + 3 + hints.length;
+  let row = Math.max(2, Math.floor((H - total) / 2));
+
+  out += moveTo(row, centerCol(W, header)) + paint(BOLD, header);
+  row += 3;
+
+  const itemWidths = items.map((it) => stringWidth(it));
+  const maxItemW = Math.max(1, ...itemWidths);
+  const itemCol = Math.max(1, Math.floor((W - maxItemW) / 2) + 1);
+
+  for (const [i, item] of items.entries()) {
+    const line = i === state.index ? paint(INVERSE, item) : item;
+    out += moveTo(row, itemCol) + line;
+    row++;
+  }
+  row += 3;
+
+  for (const line of hints) {
+    out += moveTo(row, centerCol(W, line)) + paint(DIM, line);
+    row++;
+  }
+  return out;
+}
+
+function renderLesson(state: LessonPlayState, termW: number, termH: number): string {
   const layout = computeLayout(termW, termH);
   let out = clearScreen();
   out += renderFrame(layout);
 
+  const lastIndex = state.lesson.steps.length - 1;
+  const isLastStep = state.stepIndex === lastIndex;
   const step = state.lesson.steps[state.stepIndex];
   if (step) {
     out += renderTarget(layout.target, step.target);
     out += renderRepresentation(layout.representation, step.representation);
     out += renderCpuBusMemory(layout.cpuBusMemory, step.cpuBusMemory);
-    out += renderExplainQuiz(layout.explainQuiz, step.explainQuiz, state.quizInput);
+    out += renderExplainQuiz(layout.explainQuiz, step.explainQuiz, state.quizInput, isLastStep);
   }
 
   const progress = `${state.lesson.id} step ${state.stepIndex + 1}/${state.lesson.steps.length}`;
   const modeLabel = `mode:${state.displayMode}`;
-  const hint = `${progress}   [n]next [p]prev [r]reset [q]quit [space]auto [1/2/3]mode   ${modeLabel}`;
+  const nextLabel = isLastStep ? "finish" : "next";
+  const hint = `${progress}   [n]${nextLabel} [p]prev [r]reset [m/q]menu [space]auto [1/2/3]mode   ${modeLabel}`;
   out += moveTo(layout.hintRow, 1) + truncate(hint, layout.totalWidth);
 
   return out;
+}
+
+export function render(state: AppState, termW: number, termH: number): string {
+  switch (state.screen) {
+    case "title":
+      return renderTitle(termW, termH);
+    case "menu":
+      return renderMenu(state, termW, termH);
+    case "lesson":
+      return renderLesson(state, termW, termH);
+  }
 }

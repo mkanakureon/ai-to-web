@@ -1,8 +1,6 @@
 // 仕様出典: docs/reports/2026/04/18/04-l0-curriculum-spec.md — L0-1
 import type { Lesson } from "../types.js";
 
-const DEFAULT_KEY_HINTS = ["[n]next", "[p]prev", "[q]quit"];
-
 const BASE_MEMORY = [
   { address: "0x0FFC", value: "0x10" },
   { address: "0x1000", value: "0x41" },
@@ -31,7 +29,6 @@ export const l0_1: Lesson = {
           "これから 65 という 1 バイトの値を観察します。",
           "同じ値が複数の顔を持ちます。",
         ],
-        keyHints: DEFAULT_KEY_HINTS,
       },
     },
     // Step 2 — 2進数を並べる
@@ -54,7 +51,6 @@ export const l0_1: Lesson = {
         explanationLines: [
           "これが 2 進数の姿。8 個の 0/1 が 1 バイトです。",
         ],
-        keyHints: DEFAULT_KEY_HINTS,
       },
     },
     // Step 3 — ビット位置を示す
@@ -83,7 +79,6 @@ export const l0_1: Lesson = {
           "右端がビット 0（1 の位）、左端がビット 7。",
           "各桁の重みは 2 の累乗です。",
         ],
-        keyHints: DEFAULT_KEY_HINTS,
       },
     },
     // Step 4 — 16進数を並べる
@@ -112,7 +107,6 @@ export const l0_1: Lesson = {
           "4 ビットずつまとめると 16 進数になります。",
           "0100 → 4、0001 → 1、合わせて 0x41。",
         ],
-        keyHints: DEFAULT_KEY_HINTS,
       },
     },
     // Step 5 — 文字の意味を示す + Quiz
@@ -146,7 +140,6 @@ export const l0_1: Lesson = {
           "ASCII コード表で 65 は 'A'。",
           "同じ 1 バイトが 10/2/16 進と文字、4 つの顔を持ちます。",
         ],
-        keyHints: [...DEFAULT_KEY_HINTS, "[a/b/c]answer"],
         quiz: {
           question: "1 バイトは何ビットですか?",
           choices: [

@@ -54,7 +54,6 @@ export type Quiz = {
 
 export type ExplainQuizPaneState = {
   explanationLines: string[];
-  keyHints: string[];
   quiz?: Quiz;
 };
 
@@ -73,7 +72,20 @@ export type Lesson = {
 
 export type DisplayMode = "binary" | "hex" | "char";
 
-export type AppState = {
+// ── 画面モード (Screen / AppState) ──
+export type TitleState = {
+  screen: "title";
+  quit: boolean;
+};
+
+export type MenuState = {
+  screen: "menu";
+  index: number;
+  quit: boolean;
+};
+
+export type LessonPlayState = {
+  screen: "lesson";
   lesson: Lesson;
   stepIndex: number;
   displayMode: DisplayMode;
@@ -82,12 +94,19 @@ export type AppState = {
   quit: boolean;
 };
 
+export type AppState = TitleState | MenuState | LessonPlayState;
+
 export type KeyEvent =
   | { kind: "next" }
   | { kind: "prev" }
   | { kind: "reset" }
   | { kind: "quit" }
+  | { kind: "forceQuit" }
   | { kind: "hint" }
   | { kind: "toggleAuto" }
   | { kind: "mode"; mode: DisplayMode }
-  | { kind: "choice"; id: string };
+  | { kind: "choice"; id: string }
+  | { kind: "up" }
+  | { kind: "down" }
+  | { kind: "enter" }
+  | { kind: "back" };

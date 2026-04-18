@@ -2,8 +2,6 @@
 // Target: 2 バイト値 0x1234 が Big/Little Endian でメモリにどう並ぶかを対比観察する
 import type { Lesson } from "../types.js";
 
-const DEFAULT_KEY_HINTS = ["[n]next", "[p]prev", "[q]quit"];
-
 const TARGET_LINES = ["uint16_t n = 0x1234;"];
 
 export const l2: Lesson = {
@@ -32,7 +30,6 @@ export const l2: Lesson = {
           "2 バイトの値 0x1234 を high=0x12 と low=0x34 に分けます。",
           "メモリのどちらの番地に high と low を置くか? 2 通りあります。",
         ],
-        keyHints: DEFAULT_KEY_HINTS,
       },
     },
     // Step 2 — Big Endian 配置
@@ -58,7 +55,6 @@ export const l2: Lesson = {
           "Big Endian: 高位バイトを低アドレスに置く。",
           "人間が数を書く順 (1234) と同じで、[high=0x12][low=0x34] と並ぶ。",
         ],
-        keyHints: DEFAULT_KEY_HINTS,
       },
     },
     // Step 3 — Little Endian 配置
@@ -85,7 +81,6 @@ export const l2: Lesson = {
           "Little Endian: 低位バイトを低アドレスに置く。",
           "メモリは [low=0x34][high=0x12] の順。x86 や ARM はこちら。",
         ],
-        keyHints: DEFAULT_KEY_HINTS,
       },
     },
     // Step 4 — 実務での使い分け
@@ -112,7 +107,6 @@ export const l2: Lesson = {
           "一方 TCP/IP や HTTP/2 のバイナリフィールドは BE (network byte order)。",
           "通信時は htons() 等で変換するのが約束事。",
         ],
-        keyHints: DEFAULT_KEY_HINTS,
       },
     },
     // Step 5 — Quiz
@@ -136,7 +130,6 @@ export const l2: Lesson = {
           "LE = 低位バイトが低アドレス。",
           "1 バイト (L0, L1) なら関係ないが、2 バイト以上で効いてくる。",
         ],
-        keyHints: [...DEFAULT_KEY_HINTS, "[a/b/c]answer"],
         quiz: {
           question: "x86 系 CPU のメモリ上のバイト順は?",
           choices: [

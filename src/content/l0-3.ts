@@ -1,8 +1,6 @@
 // 仕様出典: docs/reports/2026/04/18/04-l0-curriculum-spec.md — L0-3
 import type { Lesson, MemoryCell } from "../types.js";
 
-const DEFAULT_KEY_HINTS = ["[n]next", "[p]prev", "[q]quit"];
-
 function baseMemory(): MemoryCell[] {
   return [
     { address: "0x0FFC", value: "0x10" },
@@ -33,7 +31,6 @@ export const l0_3: Lesson = {
           "C のコードを 1 バイトレベルで追いかけます。",
           "x は名前、実体はメモリの中にあります。",
         ],
-        keyHints: DEFAULT_KEY_HINTS,
       },
     },
     // Step 2 — x の場所を示す
@@ -62,7 +59,6 @@ export const l0_3: Lesson = {
           "x は名前です。",
           "実体はメモリの 0x1000 番地にある 1 バイト 0x41。",
         ],
-        keyHints: DEFAULT_KEY_HINTS,
       },
     },
     // Step 3 — print(x) が CPU に読み取りを頼む
@@ -94,7 +90,6 @@ export const l0_3: Lesson = {
           "print(x) は x を渡すために、まず中身を読みます。",
           "L0-2 と同じ手順で、CPU が 0x1000 を Address Bus に流します。",
         ],
-        keyHints: DEFAULT_KEY_HINTS,
       },
     },
     // Step 4 — Data Bus で値が返り MDR に入る
@@ -128,7 +123,6 @@ export const l0_3: Lesson = {
           "CPU は 0x41 を受け取りました。",
           "この値は ASCII で 'A'。",
         ],
-        keyHints: DEFAULT_KEY_HINTS,
       },
     },
     // Step 5 — 出力される + Quiz
@@ -164,7 +158,6 @@ export const l0_3: Lesson = {
           "読むときは CPU がアドレスを指定する。",
           "C の 2 行はこの一連の動きです。",
         ],
-        keyHints: [...DEFAULT_KEY_HINTS, "[a/b/c]answer"],
         quiz: {
           question: "`char x = 'A'` で作られた x の正体は次のどれに近いですか?",
           choices: [

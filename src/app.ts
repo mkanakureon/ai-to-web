@@ -1,20 +1,14 @@
 // メインループ: input → reduce → render
 import { getLesson, listLessonIds, LESSONS } from "./content/index.js";
 import type { AppState, Lesson } from "./types.js";
-import { reduce } from "./reduce.js";
+import { reduce, enterTitle, enterLesson } from "./reduce.js";
 import { render } from "./render.js";
 import { startKeyboard, type Keyboard } from "./keyboard.js";
 import { clearScreen, hideCursor, showCursor, moveTo, RESET } from "./ansi.js";
 
-const DEFAULT_LESSON_ID = "L0-1";
-
-function selectLesson(argv: string[]): Lesson {
+function selectInitialState(argv: string[]): AppState {
   const requested = argv[2];
-  if (!requested) {
-    const first = LESSONS[0];
-    if (!first) throw new Error("No lessons registered");
-    return first;
-  }
+  if (!requested) return enterTitle();
   if (requested === "--help" || requested === "-h") {
     printUsage();
     process.exit(0);
@@ -29,27 +23,17 @@ function selectLesson(argv: string[]): Lesson {
     console.error(`Available: ${listLessonIds().join(", ")}`);
     process.exit(1);
   }
-  return lesson;
+  return enterLesson(lesson);
 }
 
 function printUsage(): void {
   console.log(`Usage: ai-to-web [lesson-id]
 
-  lesson-id: ${listLessonIds().join(" | ")}  (default: ${DEFAULT_LESSON_ID})
+  (no argument)        タイトル画面 → メニュー → レッスン選択
+  lesson-id            指定レッスンに直接入る (${listLessonIds().join(" | ")})
 
-  --list     list available lessons
-  --help     show this help`);
-}
-
-function initialState(lesson: Lesson): AppState {
-  return {
-    lesson,
-    stepIndex: 0,
-    displayMode: "binary",
-    autoPlay: false,
-    quizInput: null,
-    quit: false,
-  };
+  --list     利用可能なレッスン ID を列挙
+  --help     このヘルプを表示`);
 }
 
 function getTermSize(): { w: number; h: number } {
@@ -70,14 +54,14 @@ process.on("exit", () => {
 });
 
 export async function runApp(): Promise<void> {
-  const lesson = selectLesson(process.argv);
+  const initial = selectInitialState(process.argv);
 
   if (!process.stdout.isTTY) {
-    runHeadless(lesson);
+    runHeadless(initial);
     return;
   }
 
-  let state = initialState(lesson);
+  let state: AppState = initial;
   const draw = (): void => {
     const { w, h } = getTermSize();
     process.stdout.write(render(state, w, h));
@@ -105,7 +89,22 @@ export async function runApp(): Promise<void> {
   });
 }
 
-function runHeadless(lesson: Lesson): void {
+function runHeadless(state: AppState): void {
+  if (state.screen === "title") {
+    console.log(`[ai-to-web] TTY未検出。タイトル画面 (ヘッドレス)`);
+    console.log(`lessons: ${LESSONS.map((l) => l.id).join(", ")}`);
+    return;
+  }
+  if (state.screen === "menu") {
+    console.log(`[ai-to-web] TTY未検出。メニュー画面 (index=${state.index})`);
+    for (const [i, l] of LESSONS.entries()) {
+      const marker = i === state.index ? ">" : " ";
+      console.log(`  ${marker} ${l.id.padEnd(5)} ${l.title}`);
+    }
+    return;
+  }
+  // lesson
+  const lesson: Lesson = state.lesson;
   console.log(`[ai-to-web] TTY未検出のためヘッドレス表示 (lesson=${lesson.id})`);
   console.log(`lesson: ${lesson.id} "${lesson.title}"`);
   console.log(`steps : ${lesson.steps.length}`);

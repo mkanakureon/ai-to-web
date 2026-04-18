@@ -36,9 +36,14 @@ export function startKeyboard(onKey: Listener): Keyboard {
 }
 
 function parseKey(data: string): KeyEvent | null {
-  // Ctrl+C / Ctrl+D
-  if (data === "\x03" || data === "\x04") return { kind: "quit" };
-  // 複数バイト（エスケープシーケンス等）は無視
+  // Ctrl+C / Ctrl+D: 画面を問わず強制終了
+  if (data === "\x03" || data === "\x04") return { kind: "forceQuit" };
+  // 矢印キー (ESC [ A/B/C/D)
+  if (data === "\x1b[A") return { kind: "up" };
+  if (data === "\x1b[B") return { kind: "down" };
+  // Enter
+  if (data === "\r" || data === "\n") return { kind: "enter" };
+  // その他マルチバイト (未使用のエスケープ等) は無視
   if (data.length > 1) return null;
 
   const ch = data.toLowerCase();
@@ -48,6 +53,9 @@ function parseKey(data: string): KeyEvent | null {
     case "r": return { kind: "reset" };
     case "q": return { kind: "quit" };
     case "h": return { kind: "hint" };
+    case "m": return { kind: "back" };
+    case "j": return { kind: "down" };
+    case "k": return { kind: "up" };
     case " ": return { kind: "toggleAuto" };
     case "1": return { kind: "mode", mode: "binary" };
     case "2": return { kind: "mode", mode: "hex" };

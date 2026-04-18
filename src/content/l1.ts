@@ -2,8 +2,6 @@
 // Target: uint8_t/uint16_t/uint32_t が占めるバイト数を観察する
 import type { Lesson } from "../types.js";
 
-const DEFAULT_KEY_HINTS = ["[n]next", "[p]prev", "[q]quit"];
-
 // a (uint8_t = 65 = 0x41)           : 0x1000
 // b (uint16_t = 256 = 0x0100, LE)    : 0x1001..0x1002
 // c (uint32_t = 65536 = 0x00010000)  : 0x1003..0x1006
@@ -38,7 +36,6 @@ export const l1: Lesson = {
           "uint8_t は 8ビット = 1バイト。",
           "1バイトで表せる値は 2^8 = 256 通り (0〜255)。",
         ],
-        keyHints: DEFAULT_KEY_HINTS,
       },
     },
     // Step 2 — add uint16_t b (2 bytes)
@@ -60,7 +57,6 @@ export const l1: Lesson = {
           "256 = 0x0100 が 2 セルに分かれてメモリに並ぶ。",
           "(バイト順の話は L2 エンディアンで詳しく)",
         ],
-        keyHints: DEFAULT_KEY_HINTS,
       },
     },
     // Step 3 — add uint32_t c (4 bytes)
@@ -86,7 +82,6 @@ export const l1: Lesson = {
           "uint32_t は 32ビット = 4バイト。",
           "3 種類の型が並ぶと、1 / 2 / 4 と占める幅が違う。",
         ],
-        keyHints: DEFAULT_KEY_HINTS,
       },
     },
     // Step 4 — show value ranges
@@ -112,7 +107,6 @@ export const l1: Lesson = {
           "何バイトあるか = 何通り表現できるか。",
           "n バイトなら 2^(8n) 通り。型選びは値の範囲とメモリのトレードオフ。",
         ],
-        keyHints: DEFAULT_KEY_HINTS,
       },
     },
     // Step 5 — Quiz
@@ -138,7 +132,6 @@ export const l1: Lesson = {
           "型の幅 = メモリに占めるバイト数。",
           "uint8/16/32 の数字は「そのままビット数」。",
         ],
-        keyHints: [...DEFAULT_KEY_HINTS, "[a/b/c]answer"],
         quiz: {
           question: "uint16_t 型の変数はメモリを何バイト使いますか?",
           choices: [
