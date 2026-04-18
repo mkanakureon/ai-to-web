@@ -21,6 +21,7 @@ export function parseKey(data: string): KeyEvent | null {
     case "q": return { kind: "quit" };
     case "h": return { kind: "hint" };
     case "m": return { kind: "back" };
+    case "t": return { kind: "title" };
     case "j": return { kind: "down" };
     case "k": return { kind: "up" };
     case " ": return { kind: "toggleAuto" };

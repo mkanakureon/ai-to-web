@@ -129,4 +129,5 @@ export type KeyEvent =
   | { kind: "up" }
   | { kind: "down" }
   | { kind: "enter" }
-  | { kind: "back" };
+  | { kind: "back" }
+  | { kind: "title" };

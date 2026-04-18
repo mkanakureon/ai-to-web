@@ -70,6 +70,10 @@ const cases: Case[] = [
   { name: "forceQuit from title", initial: enterTitle(), events: [{ kind: "forceQuit" }], expect: { screen: "title", quit: true } },
   { name: "forceQuit from menu", initial: enterMenu(), events: [{ kind: "forceQuit" }], expect: { screen: "menu", quit: true } },
   { name: "forceQuit from lesson", initial: lessonInitial(), events: [{ kind: "forceQuit" }], expect: { screen: "lesson", quit: true } },
+  { name: "title: t → no-op (stays title)", initial: enterTitle(), events: [{ kind: "title" }], expect: { screen: "title" } },
+  { name: "menu: t → title", initial: enterMenu(2), events: [{ kind: "title" }], expect: { screen: "title" } },
+  { name: "intro: t → title", initial: enterIntro(l0_1), events: [{ kind: "title" }], expect: { screen: "title" } },
+  { name: "lesson: t → title", initial: lessonInitial(), events: [{ kind: "title" }], expect: { screen: "title" } },
 ];
 
 let failed = 0;

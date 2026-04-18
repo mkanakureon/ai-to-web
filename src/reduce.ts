@@ -48,6 +48,11 @@ export function reduce(state: AppState, event: KeyEvent): AppState {
     return { ...state, quit: true };
   }
 
+  // "t" はどこからでもタイトル画面へ戻る (タイトル画面では無視)
+  if (event.kind === "title" && state.screen !== "title") {
+    return enterTitle();
+  }
+
   switch (state.screen) {
     case "title":
       return reduceTitle(state, event);

@@ -407,7 +407,7 @@ function renderMenu(state: MenuState, termW: number, termH: number): string {
     const marker = i === state.index ? ">" : " ";
     return `${marker}  ${l.id.padEnd(5)}  ${l.title}`;
   });
-  const hints = ["[up/down or j/k]  select    [Enter]  start    [q]  quit"];
+  const hints = ["[up/down or j/k]  select    [Enter]  start    [t]  title    [q]  quit"];
 
   let out = clearScreen();
 
@@ -501,8 +501,8 @@ function renderIntro(state: LessonIntroState, termW: number, termH: number): str
   // 最下行のキーヒント (観察ステップの有無で動的に切替)
   const hasSteps = state.lesson.steps.length > 0;
   const bottomHint = hasSteps
-    ? "[Enter / n]  観察を始める      [m / q]  メニューへ戻る"
-    : "[Enter / n / m / q]  メニューへ戻る";
+    ? "[Enter / n]  観察を始める    [m / q]  メニュー    [t]  タイトル"
+    : "[Enter / n / m / q]  メニュー    [t]  タイトル";
   out += moveTo(H, Math.max(1, Math.floor((W - stringWidth(bottomHint)) / 2) + 1)) + paint(DIM, bottomHint);
 
   return out;
@@ -526,7 +526,7 @@ function renderLesson(state: LessonPlayState, termW: number, termH: number): str
   const progress = `${state.lesson.id} step ${state.stepIndex + 1}/${state.lesson.steps.length}`;
   const modeLabel = `mode:${state.displayMode}`;
   const nextLabel = isLastStep ? "finish" : "next";
-  const hint = `${progress}   [n]${nextLabel} [p]prev [r]reset [m/q]menu [space]auto [1/2/3]mode   ${modeLabel}`;
+  const hint = `${progress}   [n]${nextLabel} [p]prev [r]reset [m/q]menu [t]title [space]auto [1/2/3]mode   ${modeLabel}`;
   out += moveTo(layout.hintRow, 1) + truncate(hint, layout.totalWidth);
 
   return out;
