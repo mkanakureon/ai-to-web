@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'FILE=$(jq -r \".tool_input.file_path // .tool_input.file\" < /dev/stdin); case \"$FILE\" in *.env|*.env.*|.eslintrc*|.claude/settings*) echo \"BLOCKED: $FILE is a protected file\" >&2; exit 2;; esac'"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'FILE=$(jq -r \".tool_input.file_path // .tool_input.file\" < /dev/stdin); case \"$FILE\" in *.ts|*.tsx|*.js|*.jsx|*.mjs|*.cjs) command -v npx >/dev/null 2>&1 && npx --no-install oxlint \"$FILE\" 2>&1 | head -30 || true;; esac'"
+          }
+        ]
+      }
+    ]
+  }
+}
