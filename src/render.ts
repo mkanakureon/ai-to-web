@@ -498,8 +498,11 @@ function renderIntro(state: LessonIntroState, termW: number, termH: number): str
     }
   }
 
-  // 最下行のキーヒント
-  const bottomHint = "[Enter / n]  観察を始める      [m / q]  メニューへ戻る";
+  // 最下行のキーヒント (観察ステップの有無で動的に切替)
+  const hasSteps = state.lesson.steps.length > 0;
+  const bottomHint = hasSteps
+    ? "[Enter / n]  観察を始める      [m / q]  メニューへ戻る"
+    : "[Enter / n / m / q]  メニューへ戻る";
   out += moveTo(H, Math.max(1, Math.floor((W - stringWidth(bottomHint)) / 2) + 1)) + paint(DIM, bottomHint);
 
   return out;

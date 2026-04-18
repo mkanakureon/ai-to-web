@@ -2,6 +2,7 @@
 // 使い方: npx tsx scripts/reducer-check.ts
 
 import { reduce, enterTitle, enterMenu, enterIntro, enterLesson } from "../src/reduce.js";
+import { l0_0 } from "../src/content/l0-0.js";
 import { l0_1 } from "../src/content/l0-1.js";
 import type { AppState, KeyEvent, LessonPlayState } from "../src/types.js";
 
@@ -21,7 +22,7 @@ const cases: Case[] = [
   { name: "lesson: initial", initial: lessonInitial(), events: [], expect: { screen: "lesson", stepIndex: 0, quit: false, quizInput: null } },
   { name: "lesson: next x1", initial: lessonInitial(), events: [{ kind: "next" }], expect: { screen: "lesson", stepIndex: 1 } },
   { name: "lesson: next x4 to last step", initial: lessonInitial(), events: Array.from({ length: 4 }, () => ({ kind: "next" as const })), expect: { screen: "lesson", stepIndex: 4 } },
-  { name: "lesson: next at last step → menu", initial: lessonInitial(), events: Array.from({ length: 5 }, () => ({ kind: "next" as const })), expect: { screen: "menu", index: 0 } },
+  { name: "lesson: next at last step → menu", initial: lessonInitial(), events: Array.from({ length: 5 }, () => ({ kind: "next" as const })), expect: { screen: "menu", index: 1 } },
   { name: "lesson: prev at 0 stays", initial: lessonInitial(), events: [{ kind: "prev" }, { kind: "prev" }], expect: { screen: "lesson", stepIndex: 0 } },
   { name: "lesson: reset", initial: lessonInitial(), events: [{ kind: "next" }, { kind: "next" }, { kind: "reset" }], expect: { screen: "lesson", stepIndex: 0, quizInput: null } },
   { name: "lesson: toggleAuto", initial: lessonInitial(), events: [{ kind: "toggleAuto" }], expect: { screen: "lesson", autoPlay: true } },
@@ -55,15 +56,16 @@ const cases: Case[] = [
   { name: "menu: quit", initial: enterMenu(), events: [{ kind: "quit" }], expect: { screen: "menu", quit: true } },
   { name: "intro: enter → lesson (step 0)", initial: enterIntro(l0_1), events: [{ kind: "enter" }], expect: { screen: "lesson", stepIndex: 0 } },
   { name: "intro: n → lesson", initial: enterIntro(l0_1), events: [{ kind: "next" }], expect: { screen: "lesson", stepIndex: 0 } },
-  { name: "intro: back → menu (same lesson selected)", initial: enterIntro(l0_1), events: [{ kind: "back" }], expect: { screen: "menu", index: 0 } },
-  { name: "intro: q → menu", initial: enterIntro(l0_1), events: [{ kind: "quit" }], expect: { screen: "menu", index: 0 } },
+  { name: "intro: back → menu (same lesson selected)", initial: enterIntro(l0_1), events: [{ kind: "back" }], expect: { screen: "menu", index: 1 } },
+  { name: "intro: q → menu", initial: enterIntro(l0_1), events: [{ kind: "quit" }], expect: { screen: "menu", index: 1 } },
+  { name: "intro: empty-steps enter → menu (no lesson)", initial: enterIntro(l0_0), events: [{ kind: "enter" }], expect: { screen: "menu", index: 0 } },
   { name: "lesson: q returns to menu", initial: lessonInitial(), events: [{ kind: "quit" }], expect: { screen: "menu" } },
   { name: "lesson: back returns to menu", initial: lessonInitial(), events: [{ kind: "back" }], expect: { screen: "menu" } },
   {
     name: "lesson: back selects current lesson in menu",
     initial: enterLesson(l0_1),
     events: [{ kind: "back" }],
-    expect: { screen: "menu", index: 0 },
+    expect: { screen: "menu", index: 1 },
   },
   { name: "forceQuit from title", initial: enterTitle(), events: [{ kind: "forceQuit" }], expect: { screen: "title", quit: true } },
   { name: "forceQuit from menu", initial: enterMenu(), events: [{ kind: "forceQuit" }], expect: { screen: "menu", quit: true } },

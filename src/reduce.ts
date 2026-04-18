@@ -97,8 +97,14 @@ function reduceMenu(state: MenuState, event: KeyEvent): AppState {
 function reduceIntro(state: LessonIntroState, event: KeyEvent): AppState {
   switch (event.kind) {
     case "enter":
-    case "next":
+    case "next": {
+      // 観察ステップがない (文書のみ) レッスンは、intro を閉じるとメニューへ戻る
+      if (state.lesson.steps.length === 0) {
+        const idx = LESSONS.findIndex((l) => l.id === state.lesson.id);
+        return enterMenu(idx >= 0 ? idx : 0);
+      }
       return enterLesson(state.lesson);
+    }
     case "quit":
     case "back": {
       const idx = LESSONS.findIndex((l) => l.id === state.lesson.id);
