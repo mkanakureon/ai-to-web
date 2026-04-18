@@ -65,9 +65,22 @@ export type LessonStep = {
   explainQuiz: ExplainQuizPaneState;
 };
 
+export type IntroTerm = {
+  term: string;
+  description: string;
+};
+
+export type LessonIntro = {
+  objective: string;           // 到達目標 (1 文)
+  overview: string[];          // 読み物 (段落の配列)
+  terms: IntroTerm[];          // キーワード
+  firstStepHint?: string;      // 最初のステップで何が見えるかの予告
+};
+
 export type Lesson = {
   id: string;
   title: string;
+  intro: LessonIntro;
   steps: LessonStep[];
 };
 
@@ -85,6 +98,12 @@ export type MenuState = {
   quit: boolean;
 };
 
+export type LessonIntroState = {
+  screen: "intro";
+  lesson: Lesson;
+  quit: boolean;
+};
+
 export type LessonPlayState = {
   screen: "lesson";
   lesson: Lesson;
@@ -95,7 +114,7 @@ export type LessonPlayState = {
   quit: boolean;
 };
 
-export type AppState = TitleState | MenuState | LessonPlayState;
+export type AppState = TitleState | MenuState | LessonIntroState | LessonPlayState;
 
 export type KeyEvent =
   | { kind: "next" }

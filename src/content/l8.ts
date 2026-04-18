@@ -24,6 +24,19 @@ function bytesAsChars(): MemoryCell[] {
 export const l8: Lesson = {
   id: "L8",
   title: "文字列 vs バイト列",
+  intro: {
+    objective: "同じ 4 バイトが文字列としては \"HTTP\"、uint32 BE としては 0x48545450、LE としては 0x50545448 になることを観察する。",
+    overview: [
+      "メモリの中身はバイト列。それを「何として読むか (= 型)」を決めるのはプログラム側。型を変えれば同じバイト列から違う値が取り出せる。",
+      "データ自体は不変でも、解釈を変えれば意味が変わる。",
+    ],
+    terms: [
+      { term: "バイト列 (byte sequence)", description: "メモリに並ぶ 0x00〜0xFF の値の列。それ自体には意味がない。" },
+      { term: "型 (type)", description: "バイト列をどう解釈するかの指定。同じバイト列でも型が違えば別の値になる。" },
+      { term: "解釈 (interpretation)", description: "バイトの並びを意味に変換する行為。char / int / float などの型がこれを担う。" },
+    ],
+    firstStepHint: "このあと: 4 バイト 0x48 0x54 0x54 0x50 を文字列 / BE整数 / LE整数 の 3 通りで読んでみます。",
+  },
   steps: [
     // Step 1 — バイトを見る (解釈なし)
     {

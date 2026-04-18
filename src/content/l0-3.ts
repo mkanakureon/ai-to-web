@@ -12,6 +12,18 @@ function baseMemory(): MemoryCell[] {
 export const l0_3: Lesson = {
   id: "L0-3",
   title: "メモリアクセスと C の接続",
+  intro: {
+    objective: "C の 2 行 `char x = 'A'; print(x);` が L0-1 (バイトの解釈) と L0-2 (CPU の読み取り) の合成であることを観察する。",
+    overview: [
+      "x は名前にすぎず、実体はメモリ上のどこかの 1 バイト。print(x) はその番地を CPU が読みに行く L0-2 の動作に展開される。",
+      "「C のソースコード ≒ メモリ上のバイトとアドレスの話」と言い切れる瞬間。",
+    ],
+    terms: [
+      { term: "変数", description: "名前とメモリ上の位置を結びつけたもの。x 自体は値を持たず、場所を指す。" },
+      { term: "実体", description: "実際にメモリ上に置かれたバイト。ここでは 0x1000 番地の 0x41。" },
+    ],
+    firstStepHint: "このあと: ソースコード → x の場所 → CPU がそこを読む → 'A' が出力される、という流れを見ます。",
+  },
   steps: [
     // Step 1 — ソースを見る
     {

@@ -3,6 +3,7 @@ import type {
   AppState,
   KeyEvent,
   Lesson,
+  LessonIntroState,
   LessonPlayState,
   MenuState,
   TitleState,
@@ -19,6 +20,10 @@ export function enterMenu(index = 0): MenuState {
   const n = LESSONS.length;
   const clamped = n === 0 ? 0 : Math.max(0, Math.min(n - 1, index));
   return { screen: "menu", index: clamped, quit: false };
+}
+
+export function enterIntro(lesson: Lesson): LessonIntroState {
+  return { screen: "intro", lesson, quit: false };
 }
 
 export function enterLesson(lesson: Lesson): LessonPlayState {
@@ -48,6 +53,8 @@ export function reduce(state: AppState, event: KeyEvent): AppState {
       return reduceTitle(state, event);
     case "menu":
       return reduceMenu(state, event);
+    case "intro":
+      return reduceIntro(state, event);
     case "lesson":
       return reduceLesson(state, event);
   }
@@ -76,12 +83,27 @@ function reduceMenu(state: MenuState, event: KeyEvent): AppState {
       return { ...state, index: Math.min(LESSONS.length - 1, state.index + 1) };
     case "enter": {
       const lesson = LESSONS[state.index];
-      if (lesson) return enterLesson(lesson);
+      if (lesson) return enterIntro(lesson);
       return state;
     }
     case "quit":
     case "back":
       return { ...state, quit: true };
+    default:
+      return state;
+  }
+}
+
+function reduceIntro(state: LessonIntroState, event: KeyEvent): AppState {
+  switch (event.kind) {
+    case "enter":
+    case "next":
+      return enterLesson(state.lesson);
+    case "quit":
+    case "back": {
+      const idx = LESSONS.findIndex((l) => l.id === state.lesson.id);
+      return enterMenu(idx >= 0 ? idx : 0);
+    }
     default:
       return state;
   }

@@ -12,6 +12,20 @@ function baseMemory(): MemoryCell[] {
 export const l0_2: Lesson = {
   id: "L0-2",
   title: "CPU / メモリ / バス",
+  intro: {
+    objective: "CPU がメモリの特定の番地から 1 バイトを読み取る 1 サイクル (MAR → Address Bus → 選択 → Data Bus → MDR) を段階的に観察する。",
+    overview: [
+      "メモリに置かれた値を CPU が使うには、まず番地を指定して取りに行く必要がある。この「読み取り 1 回分」がこれから学ぶすべての基礎動作。",
+      "アドレス用のバスとデータ用のバスが、それぞれ別方向に情報を運ぶことを見る。",
+    ],
+    terms: [
+      { term: "CPU", description: "レジスタを持ち、メモリから値を取り出して演算する装置。" },
+      { term: "MAR (Memory Address Register)", description: "CPU が読みたい番地を一時的に置くレジスタ。" },
+      { term: "MDR (Memory Data Register)", description: "メモリから返ってきた値を受け取るレジスタ。" },
+      { term: "Address Bus / Data Bus", description: "CPU ↔ メモリ 間で、アドレスと値をそれぞれ運ぶ配線。" },
+    ],
+    firstStepHint: "このあと: 0x1000 番地の値を読む手順を 5 ステップに分けて見ます。",
+  },
   steps: [
     // Step 1 — ゴール提示
     {

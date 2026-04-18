@@ -1,7 +1,7 @@
 // reducer の状態遷移テスト。期待値と一致しなければ exit 1。
 // 使い方: npx tsx scripts/reducer-check.ts
 
-import { reduce, enterTitle, enterMenu, enterLesson } from "../src/reduce.js";
+import { reduce, enterTitle, enterMenu, enterIntro, enterLesson } from "../src/reduce.js";
 import { l0_1 } from "../src/content/l0-1.js";
 import type { AppState, KeyEvent, LessonPlayState } from "../src/types.js";
 
@@ -51,8 +51,12 @@ const cases: Case[] = [
   { name: "menu: down moves index", initial: enterMenu(), events: [{ kind: "down" }, { kind: "down" }], expect: { screen: "menu", index: 2 } },
   { name: "menu: up stops at 0", initial: enterMenu(), events: [{ kind: "up" }, { kind: "up" }], expect: { screen: "menu", index: 0 } },
   { name: "menu: j/k vi-style", initial: enterMenu(), events: [{ kind: "down" }, { kind: "down" }, { kind: "up" }], expect: { screen: "menu", index: 1 } },
-  { name: "menu: enter → lesson", initial: enterMenu(), events: [{ kind: "enter" }], expect: { screen: "lesson", stepIndex: 0 } },
+  { name: "menu: enter → intro", initial: enterMenu(), events: [{ kind: "enter" }], expect: { screen: "intro" } },
   { name: "menu: quit", initial: enterMenu(), events: [{ kind: "quit" }], expect: { screen: "menu", quit: true } },
+  { name: "intro: enter → lesson (step 0)", initial: enterIntro(l0_1), events: [{ kind: "enter" }], expect: { screen: "lesson", stepIndex: 0 } },
+  { name: "intro: n → lesson", initial: enterIntro(l0_1), events: [{ kind: "next" }], expect: { screen: "lesson", stepIndex: 0 } },
+  { name: "intro: back → menu (same lesson selected)", initial: enterIntro(l0_1), events: [{ kind: "back" }], expect: { screen: "menu", index: 0 } },
+  { name: "intro: q → menu", initial: enterIntro(l0_1), events: [{ kind: "quit" }], expect: { screen: "menu", index: 0 } },
   { name: "lesson: q returns to menu", initial: lessonInitial(), events: [{ kind: "quit" }], expect: { screen: "menu" } },
   { name: "lesson: back returns to menu", initial: lessonInitial(), events: [{ kind: "back" }], expect: { screen: "menu" } },
   {

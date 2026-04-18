@@ -40,6 +40,19 @@ function memoryWithPadding(highlightPad = false, highlightB = false): MemoryCell
 export const l7: Lesson = {
   id: "L7",
   title: "パディング (alignment)",
+  intro: {
+    objective: "混合型の struct で CPU のアライメント要件のため見えない padding バイトが挿入され、sizeof が単純合計より大きくなる様子を観察する。",
+    overview: [
+      "CPU は 4 バイトの値を 4 の倍数のアドレスから読みたがる (自然な境界 / natural alignment)。",
+      "そのため char (1 byte) の直後に int (4 bytes) を置くと、char の後に 3 バイトの padding が挿入される。単純合計が 5 なのに sizeof が 8 になる理由。",
+    ],
+    terms: [
+      { term: "alignment (境界)", description: "型ごとに決められた「好ましい先頭アドレス」。int なら 4 の倍数。" },
+      { term: "padding", description: "alignment を満たすため挿入される見えないバイト。中身は不定。" },
+      { term: "natural alignment", description: "型のサイズと同じ倍数に揃えるのが基本。uint32 → 4、uint64 → 8。" },
+    ],
+    firstStepHint: "このあと: char + uint32 の struct で、単純合計 5 バイトに対し sizeof が 8 になる様子を見ます。",
+  },
   steps: [
     // Step 1 — 単純に連続配置したら?
     {

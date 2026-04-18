@@ -7,7 +7,7 @@
 import { render } from "../src/render.js";
 import { charWidth } from "../src/ansi.js";
 import { LESSONS, getLesson } from "../src/content/index.js";
-import { enterTitle, enterMenu, enterLesson } from "../src/reduce.js";
+import { enterTitle, enterMenu, enterIntro, enterLesson } from "../src/reduce.js";
 import type { AppState, Lesson, LessonPlayState } from "../src/types.js";
 
 type Grid = string[][];
@@ -78,6 +78,10 @@ const H = Number.parseInt(args[2] ?? "40", 10);
 const separator = "=".repeat(W);
 
 function dumpLesson(lesson: Lesson, w: number, h: number): void {
+  console.log(`\n${separator}`);
+  console.log(`  ${lesson.id} INTRO`);
+  console.log(separator);
+  console.log(renderSnapshot(enterIntro(lesson), w, h));
   for (let i = 0; i < lesson.steps.length; i++) {
     console.log(`\n${separator}`);
     console.log(`  ${lesson.id} STEP ${i + 1}/${lesson.steps.length}`);

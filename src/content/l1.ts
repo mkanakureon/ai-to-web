@@ -20,6 +20,19 @@ const TARGET_S3 = ["uint8_t  a = 65;", "uint16_t b = 256;", "uint32_t c = 65536;
 export const l1: Lesson = {
   id: "L1",
   title: "整数の基本",
+  intro: {
+    objective: "uint8_t / uint16_t / uint32_t がそれぞれ 1 / 2 / 4 バイトを占めることをメモリ上で確認する。",
+    overview: [
+      "同じ「整数」でも、型によって占める幅が違う。幅が大きいほど表現できる値の範囲は広いが、メモリも食う。",
+      "数字 8/16/32 はそのままビット数。1 byte = 8 bit なので 8→1byte、16→2byte、32→4byte。",
+    ],
+    terms: [
+      { term: "uint (符号なし整数)", description: "マイナスを扱わない整数型。0 以上の値のみ。" },
+      { term: "バイト幅 (width)", description: "その型がメモリで占めるバイト数。" },
+      { term: "表現範囲", description: "n バイト → 2^(8n) 通り。1 byte なら 0〜255、2 byte なら 0〜65535。" },
+    ],
+    firstStepHint: "このあと: 3 種類の uint を並べて、メモリにどう配置されるか見ていきます。",
+  },
   steps: [
     // Step 1 — uint8_t a (1 byte)
     {

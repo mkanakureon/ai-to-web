@@ -3,6 +3,7 @@
 
 import type {
   AppState,
+  LessonIntroState,
   LessonPlayState,
   MenuState,
   TargetPaneState,
@@ -434,6 +435,76 @@ function renderMenu(state: MenuState, termW: number, termH: number): string {
   return out;
 }
 
+function renderIntro(state: LessonIntroState, termW: number, termH: number): string {
+  const W = Math.max(80, termW);
+  const H = Math.max(24, termH);
+
+  const contentW = Math.min(76, W - 8);
+  const leftCol = Math.max(1, Math.floor((W - contentW) / 2) + 1);
+  const innerCol = leftCol + 2;
+  const innerW = contentW - 2;
+
+  let out = clearScreen();
+  let row = 2;
+
+  // Header: "L0-1  2進数とビット" + underline
+  const header = `${state.lesson.id}  ${state.lesson.title}`;
+  out += moveTo(row, leftCol) + paint(FG.cyan + BOLD, header);
+  row++;
+  out += moveTo(row, leftCol) + paint(FG.cyan, "─".repeat(Math.min(stringWidth(header) + 6, contentW)));
+  row += 2;
+
+  // 到達目標
+  out += moveTo(row, leftCol) + paint(BOLD, "到達目標");
+  row++;
+  for (const line of wrapLines(state.lesson.intro.objective, innerW)) {
+    out += moveTo(row, innerCol) + line;
+    row++;
+  }
+  row++;
+
+  // このレッスンについて
+  out += moveTo(row, leftCol) + paint(BOLD, "このレッスンについて");
+  row++;
+  for (const paragraph of state.lesson.intro.overview) {
+    for (const line of wrapLines(paragraph, innerW)) {
+      out += moveTo(row, innerCol) + line;
+      row++;
+    }
+    row++;
+  }
+
+  // キーワード
+  if (state.lesson.intro.terms.length > 0) {
+    out += moveTo(row, leftCol) + paint(BOLD, "キーワード");
+    row++;
+    for (const t of state.lesson.intro.terms) {
+      const head = `・${t.term}`;
+      out += moveTo(row, innerCol) + paint(FG.cyan, head);
+      row++;
+      for (const line of wrapLines(t.description, innerW - 4)) {
+        out += moveTo(row, innerCol + 4) + paint(DIM, line);
+        row++;
+      }
+    }
+    row++;
+  }
+
+  // 予告
+  if (state.lesson.intro.firstStepHint) {
+    for (const line of wrapLines(state.lesson.intro.firstStepHint, innerW)) {
+      out += moveTo(row, leftCol) + paint(DIM, line);
+      row++;
+    }
+  }
+
+  // 最下行のキーヒント
+  const bottomHint = "[Enter / n]  観察を始める      [m / q]  メニューへ戻る";
+  out += moveTo(H, Math.max(1, Math.floor((W - stringWidth(bottomHint)) / 2) + 1)) + paint(DIM, bottomHint);
+
+  return out;
+}
+
 function renderLesson(state: LessonPlayState, termW: number, termH: number): string {
   const layout = computeLayout(termW, termH);
   let out = clearScreen();
@@ -464,6 +535,8 @@ export function render(state: AppState, termW: number, termH: number): string {
       return renderTitle(termW, termH);
     case "menu":
       return renderMenu(state, termW, termH);
+    case "intro":
+      return renderIntro(state, termW, termH);
     case "lesson":
       return renderLesson(state, termW, termH);
   }

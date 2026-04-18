@@ -24,6 +24,19 @@ function baseArrayMemory() {
 export const l4: Lesson = {
   id: "L4",
   title: "配列とポインタ",
+  intro: {
+    objective: "配列アクセス arr[i] が「ベースアドレス + i × sizeof(要素)」のアドレス計算 + 読み取りであることを観察する。",
+    overview: [
+      "配列は特別な機能ではなく、連続したメモリ領域にすぎない。arr[i] の [ ] 記号の裏では掛け算と足し算でアドレスを計算し、L0-2 と同じ手順でメモリから値を取ってくる。",
+      "要素の幅 (sizeof) が違えば、インデックスごとのジャンプ幅も変わる。",
+    ],
+    terms: [
+      { term: "ベースアドレス", description: "配列の先頭 (arr[0]) が置かれている番地。" },
+      { term: "sizeof(要素)", description: "1 要素のバイト幅。uint32_t なら 4。" },
+      { term: "アドレス計算", description: "&arr[i] = &arr[0] + i × sizeof(要素)。配列アクセスの本質。" },
+    ],
+    firstStepHint: "このあと: arr[3] を用意して、arr[1] の番地がどう計算されるかを式と CPU の動きで見ます。",
+  },
   steps: [
     // Step 1 — 配列の宣言と値
     {

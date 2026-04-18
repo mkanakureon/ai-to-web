@@ -7,6 +7,19 @@ const TARGET_LINES = ["uint16_t n = 0x1234;"];
 export const l2: Lesson = {
   id: "L2",
   title: "エンディアン",
+  intro: {
+    objective: "2 バイト値 0x1234 が Little Endian と Big Endian でメモリにどう並ぶかを対比して観察する。",
+    overview: [
+      "2 バイト以上の整数は、メモリのどの番地にどのバイトを置くかで 2 通りの並べ方がある。x86 や ARM の CPU は Little Endian、TCP/IP や HTTP/2 のフィールドは Big Endian (network byte order)。",
+      "通信時は htons() 等で変換するのが約束事。",
+    ],
+    terms: [
+      { term: "Big Endian (BE)", description: "高位バイトを低アドレスに置く。人間が書く数字の並びと同じ。" },
+      { term: "Little Endian (LE)", description: "低位バイトを低アドレスに置く。x86/ARM など、現代の多くの CPU。" },
+      { term: "network byte order", description: "TCP/IP で決められた並び順。実体は BE。" },
+    ],
+    firstStepHint: "このあと: 同じ 0x1234 を BE と LE で並べ替え、メモリのラベルが入れ替わる様子を観察します。",
+  },
   steps: [
     // Step 1 — 値とバイトの内訳（メモリ配置はまだ未定）
     {

@@ -7,6 +7,19 @@ const TARGET_LINES = ["char s[] = \"Hi\";"];
 export const l3: Lesson = {
   id: "L3",
   title: "char と文字列",
+  intro: {
+    objective: "C の文字列 \"Hi\" が char の配列 + NULL 終端 1 バイトで計 3 バイトを占めることを観察する。",
+    overview: [
+      "C には「文字列」という独立した型はなく、char の配列として表現される。終端をコンピューターに知らせるため、最後に \\0 (0x00) を置くお約束。",
+      "結果、文字列のバイト数 = 文字数 + 1。",
+    ],
+    terms: [
+      { term: "char", description: "1 バイトの整数型。ASCII コードを収めるのに使う。" },
+      { term: "NULL 終端 (\\0)", description: "値 0 のバイト。「文字列の終わり」を示す約束。" },
+      { term: "文字列リテラル", description: "ダブルクォートで囲む \"...\" 表記。暗黙に末尾に \\0 が付く。" },
+    ],
+    firstStepHint: "このあと: \"Hi\" から始めて ASCII 対応 → メモリ 2 セル → 3 セル目に \\0 追加、と進みます。",
+  },
   steps: [
     // Step 1 — ソースを見る
     {

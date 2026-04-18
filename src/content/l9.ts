@@ -32,6 +32,19 @@ const TARGET_LINES = [
 export const l9: Lesson = {
   id: "L9",
   title: "HTTP の正体",
+  intro: {
+    objective: "HTTP リクエスト \"GET / HTTP/1.1\\r\\n\\r\\n\" が 18 バイトの ASCII バイト列であり、\\r\\n は 0x0D + 0x0A の 2 バイトだと観察する。",
+    overview: [
+      "HTTP は人間には読めるテキストに見えるが、実体はバイト列プロトコル。メモリ上にもネットワーク上にも、このバイト列がそのまま並ぶ。",
+      "行末の \\r\\n (CRLF) は特殊文字ではなく、0x0D と 0x0A の 2 バイトを並べただけのもの。",
+    ],
+    terms: [
+      { term: "HTTP", description: "Web の主要プロトコル。テキストに見えるが実態は ASCII バイト列。" },
+      { term: "CRLF (\\r\\n)", description: "HTTP ヘッダの行末。\\r = 0x0D, \\n = 0x0A の 2 バイト。" },
+      { term: "バイト列プロトコル", description: "通信規約がバイトの並び方で決まっているもの。TCP/IP も HTTP/2 もこれ。" },
+    ],
+    firstStepHint: "このあと: HTTP リクエストを 18 バイトに展開し、\\r\\n の位置を観察します。",
+  },
   steps: [
     // Step 1 — HTTP リクエストを見せる
     {

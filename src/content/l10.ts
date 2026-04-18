@@ -39,6 +39,21 @@ const LAYER_NIC = [
 export const l10: Lesson = {
   id: "L10",
   title: "C → HTTP → TS 全統合",
+  intro: {
+    objective: "TS の fetch() が Node → OS → NIC と 4 層降りて物理信号になるまでを、L0-L9 の学びを総動員して追う。",
+    overview: [
+      "たった 1 行の fetch() の裏では、Node ランタイムが L9 で見た HTTP バイトを組み立て、OS が TCP/IP で梱包し、NIC が DMA でメモリから読み取って電気信号として送り出す、という 4 層のスタックが降りていく。",
+      "同じ 18 バイトが層を降りるだけで、情報の中身は変わらない。",
+      "これで L0-L10 のカリキュラムは総仕上げ。",
+    ],
+    terms: [
+      { term: "ランタイム (Node)", description: "言語の実行系。fetch() を低レベル API に翻訳する。" },
+      { term: "ソケット (socket)", description: "OS が提供するネットワーク通信の入り口。read/write 形式の API。" },
+      { term: "DMA (Direct Memory Access)", description: "CPU を経由せず、NIC が直接メモリからバイトを取り出す仕組み。" },
+      { term: "ネットワークスタック", description: "TS → Node → OS → NIC の層構造。各層が自分の仕事をして次に渡す。" },
+    ],
+    firstStepHint: "このあと: 1 行の fetch() から始めて、層が 1 つずつ積み上がり、最後に DMA でメモリからバイトが流れ出る様子を見ます。",
+  },
   steps: [
     // Step 1 — TS の 1 行を見る
     {

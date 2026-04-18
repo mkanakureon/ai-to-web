@@ -13,6 +13,19 @@ const TARGET_LINES = [
 export const l6: Lesson = {
   id: "L6",
   title: "struct とメモリ配置",
+  intro: {
+    objective: "struct のフィールドが宣言順にメモリへ連続配置されることを、型が揃った最小例で観察する。",
+    overview: [
+      "struct は複数のフィールドを 1 つの型にまとめる仕組み。メモリ上では宣言順に各フィールドが並ぶ。",
+      "型が揃っていれば隙間なく並ぶ。型が混在したときの挙動は L7 で扱う。",
+    ],
+    terms: [
+      { term: "struct", description: "複数フィールドをまとめた複合型。C の基本データ構造。" },
+      { term: "フィールド (field)", description: "struct 内の各要素。名前と型を持つ。" },
+      { term: "sizeof(struct)", description: "struct 全体が占めるバイト数。フィールドの合計 + padding (L7 参照)。" },
+    ],
+    firstStepHint: "このあと: char a; char b; の 2 フィールドを宣言し、メモリに 2 バイト連続で並ぶ様子を見ます。",
+  },
   steps: [
     // Step 1 — struct 定義を見る
     {
